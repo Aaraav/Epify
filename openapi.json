@@ -1,0 +1,326 @@
+{
+    "openapi": "3.0.0",
+
+    "info": {
+        "title": "Epify Notes API",
+        "version": "1.0.0",
+        "description": "JWT based notes application"
+    },
+
+    "servers": [
+        {
+            "url": "http://localhost:3000"
+        }
+    ],
+
+    "components": {
+        "securitySchemes": {
+            "BearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    },
+
+    "paths": {
+        "/register": {
+            "post": {
+                "summary": "Register User",
+
+                "requestBody": {
+                    "required": true,
+
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    },
+
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "responses": {
+                    "201": {
+                        "description": "User created successfully"
+                    }
+                }
+            }
+        },
+
+        "/login": {
+            "post": {
+                "summary": "Login User",
+
+                "requestBody": {
+                    "required": true,
+
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    },
+
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "responses": {
+                    "200": {
+                        "description": "Login successful"
+                    }
+                }
+            }
+        },
+
+        "/notes": {
+            "get": {
+                "summary": "Get all notes with pagination",
+
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        },
+                        "description": "Page number"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        },
+                        "description": "Number of notes per page"
+                    }
+                ],
+
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of notes"
+                    }
+                }
+            },
+
+            "post": {
+                "summary": "Create note",
+
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+
+                "requestBody": {
+                    "required": true,
+
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+
+                                    "content": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "responses": {
+                    "201": {
+                        "description": "Note created"
+                    }
+                }
+            }
+        },
+
+        "/notes/{id}": {
+            "get": {
+                "summary": "Get note by id",
+
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses": {
+                    "200": {
+                        "description": "Single note"
+                    }
+                }
+            },
+
+            "put": {
+                "summary": "Update note",
+
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "requestBody": {
+                    "required": true,
+
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+
+                                    "content": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "responses": {
+                    "200": {
+                        "description": "Updated note"
+                    }
+                }
+            },
+
+            "delete": {
+                "summary": "Delete note",
+
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "responses": {
+                    "204": {
+                        "description": "Deleted successfully"
+                    }
+                }
+            }
+        },
+
+        "/notes/{id}/share": {
+            "post": {
+                "summary": "Share note",
+
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+
+                "requestBody": {
+                    "required": true,
+
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+
+                                "properties": {
+                                    "share_with_email": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                "responses": {
+                    "200": {
+                        "description": "Note shared"
+                    }
+                }
+            }
+        }
+    }
+}

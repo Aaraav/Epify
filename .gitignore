@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+
+# environment variables
+.env
+
+# logs
+logs
+*.log
+npm-debug.log*
+
+# build files
+dist/
+build/
+coverage/
+
+# prettier
+.prettier-cache
+
+# tests
+test.js
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# editor files
+.vscode/
+.idea/
+
+# package locks (optional)
+package-lock.json
+
+# temporary files
+tmp/
+temp/

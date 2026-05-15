@@ -1,0 +1,36 @@
+{
+    "name": "epify",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "format": "prettier --write ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Aaraav/Epify.git"
+    },
+    "author": "Aaraav sehgal",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Aaraav/Epify/issues"
+    },
+    "homepage": "https://github.com/Aaraav/Epify#readme",
+    "description": "",
+    "dependencies": {
+        "bcrypt": "^6.0.0",
+        "cors": "^2.8.6",
+        "dotenv": "^17.4.2",
+        "express": "^5.2.1",
+        "jsonwebtoken": "^9.0.3",
+        "mongodb": "^7.2.0",
+        "mongoose": "^9.6.2",
+        "nodemailer": "^8.0.7",
+        "nodemon": "^3.1.14",
+        "swagger-ui-express": "^5.0.1"
+    },
+    "devDependencies": {
+        "prettier": "^3.8.3"
+    }
+}
