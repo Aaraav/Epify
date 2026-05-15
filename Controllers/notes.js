@@ -115,7 +115,7 @@ export const updateNote = async (req, res) => {
             },
 
             {
-                new: true,
+        returnDocument: 'after'
             }
         ).select('-user');
 
