@@ -13,10 +13,6 @@ const transporter = nodemailer.createTransport({
         tls: {
             rejectUnauthorized: false
         },
-        // Add timeout settings for Render
-        connectionTimeout: 10000,
-        socketTimeout: 10000,
-        greetingTimeout: 10000
       });
 
 export const sendMail = async (to, subject, text) => {
