@@ -3,20 +3,21 @@ dotenv.config();
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-
-    auth: {
+        service:'gmail',
+        secure:true,
+        port: 465,
+        auth: {
         user: process.env.EMAIL,
         pass: process.env.EMAIL_PASSWORD,
-    },
-
-    tls: {
-        rejectUnauthorized: false,
-    },
-});
+        },
+        tls: {
+            rejectUnauthorized: false
+        },
+        // Add timeout settings for Render
+        connectionTimeout: 10000,
+        socketTimeout: 10000,
+        greetingTimeout: 10000
+      });
 
 export const sendMail = async (to, subject, text) => {
 
