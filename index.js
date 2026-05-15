@@ -24,6 +24,12 @@ app.use('/notes', notesRoutes);
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiDocument));
 
+app.get('/', (req, res) => {
+    res.json({
+        status: 'API Running'
+    });
+});
+
 app.get('/openapi.json', (req, res) => {
     res.json(openapiDocument);
 });
