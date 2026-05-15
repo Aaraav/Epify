@@ -10,9 +10,7 @@ const userSchema = new mongoose.Schema(
             trim: true,
 
             validate: {
-                validator: function (value) {
-                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-                },
+                validator: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
                 message: 'Invalid email format',
             },
         },
@@ -23,10 +21,8 @@ const userSchema = new mongoose.Schema(
             minlength: [8, 'Password must be at least 8 characters'],
 
             validate: {
-                validator: function (value) {
-                    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-                },
-
+                validator: (value) =>
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(value), 
                 message:
                     'Password must contain uppercase, lowercase, number and special character',
             },

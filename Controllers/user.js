@@ -31,9 +31,14 @@ export const register = async (req, res) => {
             message: 'User created successfully',
         });
     } catch (err) {
-        res.status(500).json({
-            message: err.message,
-        });
+        if (err.name === 'ValidationError') {
+            return res.status(400).json({
+                message: Object.values(err.errors)
+                    .map((e) => e.message)
+                    .join(', '),
+            });
+        }
+        res.status(500).json({ message: err.message });
     }
 };
 
@@ -41,11 +46,15 @@ export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Please fill all fields' });
+        }
+
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(400).json({
-                message: 'User does not exist',
+            return res.status(401).json({
+                message: 'Invalid email or password',
             });
         }
 

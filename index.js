@@ -26,7 +26,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiDocument));
 
 app.get('/', (req, res) => {
     res.json({
-        status: 'API Running'
+        status: 'API Running',
     });
 });
 
