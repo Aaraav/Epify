@@ -31,6 +31,7 @@ export const createNote = async (req, res) => {
 export const getNotes = async (req, res) => {
     try {
         const userId = req.user.id;
+
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
@@ -39,16 +40,24 @@ export const getNotes = async (req, res) => {
         const cached = await redisClient.get(cacheKey);
         if (cached) return res.status(200).json(JSON.parse(cached));
 
-        const notes = await Note.find({
+        const filter = {
             $or: [{ user: userId }, { sharedWith: userId }],
-        })
+        };
+
+        const totalNotes = await Note.countDocuments(filter);
+
+        const notes = await Note.find(filter)
             .select('-user -sharedWith')
             .skip(skip)
             .limit(limit)
-            .sort({ createdAt: -1 });
+            .sort({
+                createdAt: -1,
+            });
 
         if (notes.length === 0) {
-            return res.status(404).json({ message: 'No notes found' });
+            return res.status(404).json({
+                message: 'No notes found',
+            });
         }
 
         const response = {
@@ -59,12 +68,15 @@ export const getNotes = async (req, res) => {
             data: notes,
         };
 
-        // Cache the result
-        await redisClient.set(cacheKey, JSON.stringify(response), { EX: CACHE_TTL });
+        await redisClient.set(cacheKey, JSON.stringify(response), {
+            EX: CACHE_TTL,
+        });
 
         res.status(200).json(response);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({
+            message: err.message,
+        });
     }
 };
 
@@ -161,7 +173,9 @@ export const shareNote = async (req, res) => {
         }
 
         if (targetUser._id.toString() === ownerId) {
-            return res.status(400).json({ message: 'You cannot share a note with yourself' });
+            return res
+                .status(400)
+                .json({ message: 'You cannot share a note with yourself' });
         }
 
         const note = await Note.findOne({ _id: noteId, user: ownerId });
@@ -172,7 +186,9 @@ export const shareNote = async (req, res) => {
 
         const alreadyShared = note.sharedWith.includes(targetUser._id);
         if (alreadyShared) {
-            return res.status(400).json({ message: 'Note already shared with this user' });
+            return res
+                .status(400)
+                .json({ message: 'Note already shared with this user' });
         }
 
         note.sharedWith.push(targetUser._id);

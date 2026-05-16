@@ -10,8 +10,8 @@ export const redisClient = createClient({
         reconnectStrategy: (retries) => {
             if (retries > 5) return new Error('Max retries reached');
             return retries * 500; // wait 500ms, 1000ms, etc between retries
-        }
-    }
+        },
+    },
 });
 
 redisClient.on('error', (err) => console.error(' Redis Client Error:', err));

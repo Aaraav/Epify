@@ -23,19 +23,18 @@ app.use(json());
 app.use(cors());
 app.use(morgan('dev'));
 
-
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
-    message: { message: 'Too many requests, please try again later' }
+    message: { message: 'Too many requests, please try again later' },
 });
 
 app.use(limiter);
 
 app.use('/', userRoutes);
 app.use('/notes', notesRoutes);
-app.use('/',searchRouter);
-app.use('/',aboutRoutes);
+app.use('/', searchRouter);
+app.use('/', aboutRoutes);
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiDocument));
 
@@ -54,7 +53,6 @@ app.get('/health', (req, res) => {
         timestamp: new Date().toISOString(),
     });
 });
-
 
 const PORT = process.env.PORT || 3000;
 

@@ -14,13 +14,14 @@ export const register = async (req, res) => {
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
         if (!passwordRegex.test(password)) {
             return res.status(400).json({
-                message: 'Password must be at least 8 characters and contain uppercase, lowercase, number and special character'
+                message:
+                    'Password must be at least 8 characters and contain uppercase, lowercase, number and special character',
             });
         }
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(409).json({ message: 'User already exists' }); 
+            return res.status(409).json({ message: 'User already exists' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -31,7 +32,9 @@ export const register = async (req, res) => {
     } catch (err) {
         if (err.name === 'ValidationError') {
             return res.status(400).json({
-                message: Object.values(err.errors).map((e) => e.message).join(', ')
+                message: Object.values(err.errors)
+                    .map((e) => e.message)
+                    .join(', '),
             });
         }
         res.status(500).json({ message: err.message });

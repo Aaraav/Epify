@@ -10,8 +10,8 @@ const authLimiter = rateLimit({
 
 const router = express.Router();
 
-router.post('/register',authLimiter, register);
+router.post('/register', authLimiter, register);
 
-router.post('/login',authLimiter, login);
+router.post('/login', authLimiter, login);
 
 export default router;
