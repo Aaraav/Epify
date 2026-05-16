@@ -1,31 +1,33 @@
 import Note from '../Modals/notesModal.js';
 import User from '../Modals/userModal.js';
 import { sendMail } from '../Utils/sendMail.js';
+import { redisClient } from '../Connections.js';
+
+// Cache TTL (1 hour)
+const CACHE_TTL = 3600;
+
+// Helper to delete all notes-list cache pages for a user
+const invalidateUserNotesCache = async (userId) => {
+    const keys = await redisClient.keys(`notes:${userId}:page:*`);
+    if (keys.length > 0) await redisClient.del(keys);
+};
+
 export const createNote = async (req, res) => {
     try {
         const { title, content } = req.body;
 
         if (!title || !content) {
-            return res.status(400).json({
-                message: 'Title and content required',
-            });
+            return res.status(400).json({ message: 'Title and content required' });
         }
 
-        const note = await Note.create({
-            title,
-            content,
+        const note = await Note.create({ title, content, user: req.user.id });
 
-            user: req.user.id,
-        });
+        // Invalidate this user's notes list cache
+        await invalidateUserNotesCache(req.user.id);
 
-        res.status(201).json({
-            message: 'Note created',
-            note,
-        });
+        res.status(201).json({ message: 'Note created', note });
     } catch (err) {
-        res.status(500).json({
-            message: err.message,
-        });
+        res.status(500).json({ message: err.message });
     }
 };
 
@@ -35,6 +37,14 @@ export const getNotes = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
+
+        // Check cache first
+        const cacheKey = `notes:${userId}:page:${page}:limit:${limit}`;
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+            return res.status(200).json(JSON.parse(cached));
+        }
+
         const totalNotes = await Note.countDocuments({
             $or: [{ user: userId }, { sharedWith: userId }],
         });
@@ -48,165 +58,137 @@ export const getNotes = async (req, res) => {
             .sort({ createdAt: -1 });
 
         if (notes.length === 0) {
-            return res.status(404).json({
-                message: 'No notes found',
-            });
+            return res.status(404).json({ message: 'No notes found' });
         }
 
-        res.status(200).json({
+        const response = {
             currentPage: page,
             totalPages: Math.ceil(totalNotes / limit),
             totalNotes,
             count: notes.length,
             data: notes,
-        });
+        };
+
+        // Cache the result
+        await redisClient.set(cacheKey, JSON.stringify(response), { EX: CACHE_TTL });
+
+        res.status(200).json(response);
     } catch (err) {
-        res.status(500).json({
-            message: err.message,
-        });
+        res.status(500).json({ message: err.message });
     }
 };
 
 export const getNoteById = async (req, res) => {
     try {
         const noteId = req.params.id;
-
         const userId = req.user.id;
+
+        // Check cache first
+        const cacheKey = `note:${noteId}:user:${userId}`;
+        const cached = await redisClient.get(cacheKey);
+        if (cached) {
+            return res.status(200).json({ data: JSON.parse(cached) });
+        }
 
         const note = await Note.findOne({
             _id: noteId,
-
             $or: [{ user: userId }, { sharedWith: userId }],
         }).select('-user -sharedWith');
 
         if (!note) {
-            return res.status(404).json({
-                message: 'Note not found',
-            });
-        }
+            return res.status(404).json({ message: 'Note not found' });
+        }   
 
-        res.status(200).json({
-            data: note,
-        });
+        // Cache individual note
+        await redisClient.set(cacheKey, JSON.stringify(note), { EX: CACHE_TTL });
+
+        res.status(200).json({ data: note });
     } catch (err) {
-        res.status(500).json({
-            message: err.message,
-        });
+        res.status(500).json({ message: err.message });
     }
 };
 
 export const updateNote = async (req, res) => {
     try {
         const noteId = req.params.id;
-
         const userId = req.user.id;
-
         const { title, content } = req.body;
 
         const note = await Note.findOneAndUpdate(
-            {
-                _id: noteId,
-                user: userId,
-            },
-
-            {
-                title,
-                content,
-            },
-
-            {
-        returnDocument: 'after'
-            }
+            { _id: noteId, user: userId },
+            { title, content },
+            { returnDocument: 'after' }
         ).select('-user');
 
         if (!note) {
-            return res.status(404).json({
-                message: 'Note not found',
-            });
+            return res.status(404).json({ message: 'Note not found' });
         }
 
-        res.status(200).json({
-            message: 'Note updated successfully',
-            data: note,
-        });
+        // Invalidate caches
+        await redisClient.del(`note:${noteId}:user:${userId}`);
+        await invalidateUserNotesCache(userId);
+
+        res.status(200).json({ message: 'Note updated successfully', data: note });
     } catch (err) {
-        res.status(500).json({
-            message: err.message,
-        });
+        res.status(500).json({ message: err.message });
     }
 };
 
 export const deleteNote = async (req, res) => {
     try {
         const noteId = req.params.id;
-
         const userId = req.user.id;
 
-        const deletedNote = await Note.findOneAndDelete({
-            _id: noteId,
-            user: userId,
-        });
+        const deletedNote = await Note.findOneAndDelete({ _id: noteId, user: userId });
 
         if (!deletedNote) {
-            return res.status(404).json({
-                message: 'Note not found',
-            });
+            return res.status(404).json({ message: 'Note not found' });
         }
+
+        // Invalidate caches
+        await redisClient.del(`note:${noteId}:user:${userId}`);
+        await invalidateUserNotesCache(userId);
 
         res.status(204).send();
     } catch (err) {
-        res.status(500).json({
-            message: err.message,
-        });
+        res.status(500).json({ message: err.message });
     }
 };
 
 export const shareNote = async (req, res) => {
     try {
         const noteId = req.params.id;
-
         const ownerId = req.user.id;
-
         const { share_with_email } = req.body;
 
-        const targetUser = await User.findOne({
-            email: share_with_email,
-        });
-
-        if (targetUser._id.toString() === ownerId) {
-            return res.status(400).json({
-                message: 'You already own this note',
-            });
-        }
+        const targetUser = await User.findOne({ email: share_with_email });
 
         if (!targetUser) {
-            return res.status(404).json({
-                message: 'User not found',
-            });
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        const note = await Note.findOne({
-            _id: noteId,
-            user: ownerId,
-        });
+        if (targetUser._id.toString() === ownerId) {
+            return res.status(400).json({ message: 'You already own this note' });
+        }
+
+        const note = await Note.findOne({ _id: noteId, user: ownerId });
 
         if (!note) {
-            return res.status(404).json({
-                message: 'Note not found',
-            });
+            return res.status(404).json({ message: 'Note not found' });
         }
 
         const alreadyShared = note.sharedWith.includes(targetUser._id);
-
         if (alreadyShared) {
-            return res.status(400).json({
-                message: 'Note already shared',
-            });
+            return res.status(400).json({ message: 'Note already shared' });
         }
 
         note.sharedWith.push(targetUser._id);
-
         await note.save();
+
+        // Invalidate cache for both owner and the user it's shared with
+        await redisClient.del(`note:${noteId}:user:${ownerId}`);
+        await invalidateUserNotesCache(ownerId);
+        await invalidateUserNotesCache(targetUser._id.toString());
 
         await sendMail(
             targetUser.email,
@@ -214,12 +196,8 @@ export const shareNote = async (req, res) => {
             `A note titled "${note.title}" has been shared with you on Epify.`
         );
 
-        res.status(200).json({
-            message: 'Note shared successfully',
-        });
+        res.status(200).json({ message: 'Note shared successfully' });
     } catch (err) {
-        res.status(500).json({
-            message: err.message,
-        });
+        res.status(500).json({ message: err.message });
     }
 };

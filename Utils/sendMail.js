@@ -3,16 +3,16 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-host: process.env.BREVO_HOST,
+    host: process.env.BREVO_HOST,
     port: parseInt(process.env.BREVO_PORT),
-    secure: false, 
+    secure: false,
     auth: {
         user: process.env.BREVO_USER,
         pass: process.env.BREVO_PASS,
     },
     tls: {
         // Keeps local development smooth if you hit self-signed certificate issues
-        rejectUnauthorized: false 
+        rejectUnauthorized: false,
     },
 });
 

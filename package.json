@@ -19,6 +19,7 @@
     "homepage": "https://github.com/Aaraav/Epify#readme",
     "description": "",
     "dependencies": {
+        "@getbrevo/brevo": "^5.0.4",
         "bcrypt": "^6.0.0",
         "cors": "^2.8.6",
         "dotenv": "^17.4.2",
@@ -28,6 +29,7 @@
         "mongoose": "^9.6.2",
         "nodemailer": "^8.0.7",
         "nodemon": "^3.1.14",
+        "redis": "^5.12.1",
         "resend": "^6.12.3",
         "swagger-ui-express": "^5.0.1"
     },
