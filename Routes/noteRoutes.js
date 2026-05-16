@@ -10,10 +10,14 @@ import {
     deleteNote,
     shareNote,
     togglePin,
+    setReminder,
+    deleteReminder
 } from '../Controllers/notes.js';
 
 router.post('/', auth, createNote);
 router.get('/', auth, getNotes);
+router.patch('/:id/reminder', auth, validateObjectId, setReminder);
+router.delete('/:id/reminder', auth, validateObjectId, deleteReminder);
 router.get('/:id', auth, validateObjectId, getNoteById);
 router.put('/:id', auth, validateObjectId, updateNote);
 router.delete('/:id', auth, validateObjectId, deleteNote);

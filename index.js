@@ -4,6 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import fs from 'fs';
+import https from 'https';
 import swaggerUi from 'swagger-ui-express';
 
 import connectInfrastructure from './Connections.js';
@@ -11,13 +12,13 @@ import userRoutes from './Routes/userRoutes.js';
 import notesRoutes from './Routes/noteRoutes.js';
 import searchRouter from './Routes/searchRoutes.js';
 import aboutRoutes from './Routes/aboutRoute.js';
+import { startReminderCron } from './Utils/reminder.js';
 
 dotenv.config();
 
 const openapiDocument = JSON.parse(fs.readFileSync('./openapi.json', 'utf-8'));
 
 const app = express();
-connectInfrastructure();
 
 app.use(json());
 app.use(cors());
@@ -54,8 +55,25 @@ app.get('/health', (req, res) => {
     });
 });
 
+app.use((req, res) => {
+    res.status(404).json({ message: `Route ${req.method} ${req.path} not found` });
+});
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ message: 'Internal server error' });
+});
+
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-    console.log(` Server running on port ${PORT}`);
+connectInfrastructure().then(() => {
+    startReminderCron();
+
+    setInterval(() => {
+        https.get('https://epify-gf25.onrender.com/health', () => {}).on('error', () => {});
+    }, 10 * 60 * 1000);
+
+    app.listen(PORT, () => {
+        console.log(`✅ Server running on port ${PORT}`);
+    });
 });

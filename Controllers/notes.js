@@ -286,3 +286,72 @@ export const togglePin = async (req, res) => {
         });
     }
 };
+
+
+export const setReminder = async (req, res) => {
+    try {
+        const noteId = req.params.id;
+        const userId = req.user.id;
+        const { remind_at } = req.body;
+
+        if (!remind_at) {
+            return res.status(400).json({ message: 'remind_at is required' });
+        }
+
+        const reminderDate = new Date(remind_at);
+
+        if (isNaN(reminderDate.getTime())) {
+            return res.status(400).json({ message: 'Invalid date format. Use ISO 8601 e.g. 2026-05-20T10:00:00Z' });
+        }
+
+        if (reminderDate <= new Date()) {
+            return res.status(400).json({ message: 'remind_at must be a future date' });
+        }
+
+        const note = await Note.findOne({ _id: noteId, user: userId });
+
+        if (!note) {
+            return res.status(404).json({ message: 'Note not found' });
+        }
+
+        note.remind_at = reminderDate;
+        note.reminded = false;
+        await note.save();
+
+        await redisClient.del(`note:${noteId}:user:${userId}`);
+
+        res.status(200).json({
+            message: 'Reminder set successfully',
+            remind_at: note.remind_at,
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+export const deleteReminder = async (req, res) => {
+    try {
+        const noteId = req.params.id;
+        const userId = req.user.id;
+
+        const note = await Note.findOne({ _id: noteId, user: userId });
+
+        if (!note) {
+            return res.status(404).json({ message: 'Note not found' });
+        }
+
+        if (!note.remind_at) {
+            return res.status(400).json({ message: 'No reminder set on this note' });
+        }
+
+        note.remind_at = null;
+        note.reminded = false;
+        await note.save();
+
+        await redisClient.del(`note:${noteId}:user:${userId}`);
+
+        res.status(200).json({ message: 'Reminder deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
