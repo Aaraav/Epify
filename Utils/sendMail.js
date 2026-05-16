@@ -1,36 +1,33 @@
+import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 dotenv.config();
-import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        auth: {
-        user: process.env.EMAIL,
-        pass: process.env.EMAIL_PASSWORD,
-        },
-        tls: {
-            rejectUnauthorized: false
-        },
-      });
+host: process.env.BREVO_HOST,
+    port: parseInt(process.env.BREVO_PORT),
+    secure: false, 
+    auth: {
+        user: process.env.BREVO_USER,
+        pass: process.env.BREVO_PASS,
+    },
+    tls: {
+        // Keeps local development smooth if you hit self-signed certificate issues
+        rejectUnauthorized: false 
+    },
+});
 
 export const sendMail = async (to, subject, text) => {
-
     try {
-
         const info = await transporter.sendMail({
-            from: `"Epify Notes" <${process.env.EMAIL}>`,
+            from: `"Epify Notes" <${process.env.SENDER_EMAIL}>`,
             to,
-            bcc: process.env.EMAIL,
+            bcc: process.env.SENDER_EMAIL,
             subject,
             text,
         });
 
-        console.log('Mail Sent:', info.messageId);
-
+        console.log('Mail Sent:', info);
     } catch (err) {
-
-        console.log(err);
+        console.error('Error sending mail via Brevo:', err);
     }
 };

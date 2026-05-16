@@ -1,11 +1,12 @@
 import express, { json } from 'express';
+import dotenv from 'dotenv';
+
 import cors from 'cors';
 import connectDB from './Connections.js';
 import userRoutes from './Routes/userRoutes.js';
 import notesRoutes from './Routes/noteRoutes.js';
 import fs from 'fs';
 import swaggerUi from 'swagger-ui-express';
-import dotenv from 'dotenv';
 
 dotenv.config();
 
