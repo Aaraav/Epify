@@ -2,26 +2,25 @@ import mongoose from 'mongoose';
 import { createClient } from 'redis';
 import dotenv from 'dotenv';
 dotenv.config();
+
 export const redisClient = createClient({
     url: process.env.REDIS_URL,
     socket: {
-        tls: process.env.REDIS_URL?.startsWith('rediss://'), 
-        rejectUnauthorized: false
+        connectTimeout: 10000,
+        reconnectStrategy: (retries) => {
+            if (retries > 5) return new Error('Max retries reached');
+            return retries * 500; // wait 500ms, 1000ms, etc between retries
+        }
     }
-
 });
-
 
 redisClient.on('error', (err) => console.error(' Redis Client Error:', err));
 
-// Main Infrastructure Bootstrapper
 const connectInfrastructure = async () => {
     try {
-        // Connect to MongoDB
         await mongoose.connect(process.env.MONGO_URI);
         console.log(' MongoDB Connected');
 
-        // Connect to Redis
         await redisClient.connect();
         console.log(' Redis Connected');
     } catch (err) {
