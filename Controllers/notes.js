@@ -31,7 +31,6 @@ export const createNote = async (req, res) => {
 export const getNotes = async (req, res) => {
     try {
         const userId = req.user.id;
-
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
@@ -55,9 +54,7 @@ export const getNotes = async (req, res) => {
             });
 
         if (notes.length === 0) {
-            return res.status(404).json({
-                message: 'No notes found',
-            });
+            return res.status(404).json({ message: 'No notes found' });
         }
 
         const response = {
