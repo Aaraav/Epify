@@ -3,10 +3,8 @@ import User from '../Modals/userModal.js';
 import { sendMail } from '../Utils/sendMail.js';
 import { redisClient } from '../Connections.js';
 
-// Cache TTL (1 hour)
 const CACHE_TTL = 3600;
 
-// Helper to delete all notes-list cache pages for a user
 const invalidateUserNotesCache = async (userId) => {
     const keys = await redisClient.keys(`notes:${userId}:page:*`);
     if (keys.length > 0) await redisClient.del(keys);
@@ -24,7 +22,7 @@ export const createNote = async (req, res) => {
 
         // Invalidate this user's notes list cache
         await invalidateUserNotesCache(req.user.id);
-
+W
         res.status(201).json({ message: 'Note created', note });
     } catch (err) {
         res.status(500).json({ message: err.message });
