@@ -18,6 +18,8 @@ router.get('/about', (req, res) => {
                 'All endpoints validate required fields, empty strings, email format, password strength, and return appropriate 400/401/404/409 status codes.',
             'Rate Limiting':
                 'Implemented global API rate limiting using express-rate-limit to prevent abuse, spam, and excessive requests by restricting the number of requests per IP within a fixed time window.',
+            'Pinned Notes':
+                'Users can pin or unpin important notes for quick access. Pinned notes are prioritized and displayed at the top of the notes list for better organization and usability.',
         },
     });
 });

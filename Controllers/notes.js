@@ -248,3 +248,41 @@ export const searchNotes = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
+
+export const togglePin = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const noteId = req.params.id;
+
+        const note = await Note.findOne({
+            _id: noteId,
+            user: userId,
+        });
+
+        if (!note) {
+            return res.status(404).json({
+                message: 'note not found',
+            });
+        }
+
+        const currentPin = note.isPinned;
+
+        note.isPinned = !currentPin;
+
+        await note.save();
+
+        if (note.isPinned) {
+            return res.status(200).json({
+                message: 'Note Pinned Successfully',
+            });
+        } else {
+            return res.status(200).json({
+                message: 'Note unPinned Successfully',
+            });
+        }
+    } catch (err) {
+        return res.status(500).json({
+            message: 'something went wrong',
+        });
+    }
+};

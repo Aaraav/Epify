@@ -9,6 +9,7 @@ import {
     updateNote,
     deleteNote,
     shareNote,
+    togglePin,
 } from '../Controllers/notes.js';
 
 router.post('/', auth, createNote);
@@ -17,5 +18,6 @@ router.get('/:id', auth, validateObjectId, getNoteById);
 router.put('/:id', auth, validateObjectId, updateNote);
 router.delete('/:id', auth, validateObjectId, deleteNote);
 router.post('/:id/share', auth, validateObjectId, shareNote);
+router.patch('/:id/pin', auth, validateObjectId, togglePin);
 
 export default router;
