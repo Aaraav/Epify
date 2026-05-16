@@ -35,8 +35,14 @@
                                 "type": "object",
                                 "required": ["email", "password"],
                                 "properties": {
-                                    "email": { "type": "string", "example": "user@example.com" },
-                                    "password": { "type": "string", "example": "Password@123" }
+                                    "email": {
+                                        "type": "string",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "Password@123"
+                                    }
                                 }
                             }
                         }
@@ -61,8 +67,14 @@
                                 "type": "object",
                                 "required": ["email", "password"],
                                 "properties": {
-                                    "email": { "type": "string", "example": "user@example.com" },
-                                    "password": { "type": "string", "example": "Password@123" }
+                                    "email": {
+                                        "type": "string",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "Password@123"
+                                    }
                                 }
                             }
                         }
@@ -120,8 +132,14 @@
                                             "id": { "type": "string" },
                                             "title": { "type": "string" },
                                             "content": { "type": "string" },
-                                            "created_at": { "type": "string", "format": "date-time" },
-                                            "updated_at": { "type": "string", "format": "date-time" }
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
                                         }
                                     }
                                 }
@@ -144,7 +162,10 @@
                                 "required": ["title", "content"],
                                 "properties": {
                                     "title": { "type": "string", "example": "My Note" },
-                                    "content": { "type": "string", "example": "Note content here" }
+                                    "content": {
+                                        "type": "string",
+                                        "example": "Note content here"
+                                    }
                                 }
                             }
                         }
@@ -161,8 +182,14 @@
                                         "id": { "type": "string" },
                                         "title": { "type": "string" },
                                         "content": { "type": "string" },
-                                        "created_at": { "type": "string", "format": "date-time" },
-                                        "updated_at": { "type": "string", "format": "date-time" }
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "format": "date-time"
+                                        }
                                     }
                                 }
                             }
@@ -265,7 +292,10 @@
                                 "type": "object",
                                 "required": ["share_with_email"],
                                 "properties": {
-                                    "share_with_email": { "type": "string", "example": "friend@example.com" }
+                                    "share_with_email": {
+                                        "type": "string",
+                                        "example": "friend@example.com"
+                                    }
                                 }
                             }
                         }
@@ -280,50 +310,50 @@
             }
         },
         "/notes/{id}/pin": {
-    "patch": {
-        "summary": "Pin or unpin a note",
-        "security": [
-            {
-                "BearerAuth": []
-            }
-        ],
-        "parameters": [
-            {
-                "name": "id",
-                "in": "path",
-                "required": true,
-                "schema": {
-                    "type": "string"
-                },
-                "description": "Note ID"
-            }
-        ],
-        "responses": {
-            "200": {
-                "description": "Pin status updated successfully",
-                "content": {
-                    "application/json": {
+            "patch": {
+                "summary": "Pin or unpin a note",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
                         "schema": {
-                            "type": "object",
-                            "properties": {
-                                "message": {
-                                    "type": "string",
-                                    "example": "Note Pinned Successfully"
+                            "type": "string"
+                        },
+                        "description": "Note ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pin status updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Note Pinned Successfully"
+                                        }
+                                    }
                                 }
                             }
                         }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Note not found"
                     }
                 }
-            },
-            "401": {
-                "description": "Unauthorized"
-            },
-            "404": {
-                "description": "Note not found"
             }
-        }
-    }
-},
+        },
 
         "/search": {
             "get": {
@@ -373,8 +403,14 @@
                                                     "id": { "type": "string" },
                                                     "title": { "type": "string" },
                                                     "content": { "type": "string" },
-                                                    "created_at": { "type": "string", "format": "date-time" },
-                                                    "updated_at": { "type": "string", "format": "date-time" }
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    }
                                                 }
                                             }
                                         }

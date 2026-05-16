@@ -8,19 +8,19 @@ Epify allows users to create, manage, search, share, and organize notes securely
 
 ## Features
 
-* 🔐 JWT Authentication
-* 👤 User Registration & Login
-* 📝 Create, Read, Update, Delete Notes
-* 📌 Pin / Unpin Notes
-* 🤝 Share notes with other users
-* 🔎 Full-text search across notes
-* ⚡ Redis caching for paginated notes
-* 📄 Pagination support
-* 📧 Email notifications using Brevo SMTP
-* 🛡️ Input validation
-* 🚦 Rate limiting with Express Rate Limit
-* 📚 Swagger/OpenAPI documentation
-* 🧪 API testing with edge cases
+- 🔐 JWT Authentication
+- 👤 User Registration & Login
+- 📝 Create, Read, Update, Delete Notes
+- 📌 Pin / Unpin Notes
+- 🤝 Share notes with other users
+- 🔎 Full-text search across notes
+- ⚡ Redis caching for paginated notes
+- 📄 Pagination support
+- 📧 Email notifications using Brevo SMTP
+- 🛡️ Input validation
+- 🚦 Rate limiting with Express Rate Limit
+- 📚 Swagger/OpenAPI documentation
+- 🧪 API testing with edge cases
 
 ---
 
@@ -28,30 +28,30 @@ Epify allows users to create, manage, search, share, and organize notes securely
 
 ### Backend
 
-* Node.js
-* Express.js
+- Node.js
+- Express.js
 
 ### Database
 
-* MongoDB
-* Mongoose
+- MongoDB
+- Mongoose
 
 ### Caching
 
-* Redis
+- Redis
 
 ### Authentication
 
-* JWT (JSON Web Token)
+- JWT (JSON Web Token)
 
 ### Documentation
 
-* Swagger UI
-* OpenAPI Specification
+- Swagger UI
+- OpenAPI Specification
 
 ### Email Service
 
-* Brevo SMTP
+- Brevo SMTP
 
 ---
 
@@ -193,31 +193,31 @@ notes:{userId}:page:{page}:limit:{limit}
 
 Cache automatically invalidates when:
 
-* Creating notes
-* Updating notes
-* Deleting notes
-* Sharing notes
+- Creating notes
+- Updating notes
+- Deleting notes
+- Sharing notes
 
 ---
 
 ## Performance Optimizations
 
-* Redis caching reduces repeated MongoDB queries
-* Pagination prevents large response payloads
-* MongoDB text indexes improve search performance
-* Automatic cache invalidation ensures fresh data
-* Rate limiting prevents excessive API requests
+- Redis caching reduces repeated MongoDB queries
+- Pagination prevents large response payloads
+- MongoDB text indexes improve search performance
+- Automatic cache invalidation ensures fresh data
+- Rate limiting prevents excessive API requests
 
 ---
 
 ## Security Features
 
-* JWT authentication
-* Password hashing
-* Protected routes
-* Request rate limiting
-* Input validation
-* Error handling middleware
+- JWT authentication
+- Password hashing
+- Protected routes
+- Request rate limiting
+- Input validation
+- Error handling middleware
 
 ---
 
@@ -249,26 +249,26 @@ node test.js
 
 Current tests cover:
 
-* Authentication
-* CRUD operations
-* Search
-* Sharing
-* Pagination
-* Authorization
-* Rate limiting
-* OpenAPI endpoints
-* Edge cases
+- Authentication
+- CRUD operations
+- Search
+- Sharing
+- Pagination
+- Authorization
+- Rate limiting
+- OpenAPI endpoints
+- Edge cases
 
 ---
 
 ## Future Improvements
 
-* Real-time collaboration using WebSockets
-* AI-powered note summarization
-* Tags and categories
-* Soft delete with restore
-* Reminder notifications
-* File attachments
+- Real-time collaboration using WebSockets
+- AI-powered note summarization
+- Tags and categories
+- Soft delete with restore
+- Reminder notifications
+- File attachments
 
 ---
 
@@ -280,14 +280,14 @@ Backend Developer | Full Stack Developer
 
 **Tech Stack**
 
-* Node.js
-* Express.js
-* MongoDB
-* Redis
-* JWT
-* Docker
-* React
-* Next.js
+- Node.js
+- Express.js
+- MongoDB
+- Redis
+- JWT
+- Docker
+- React
+- Next.js
 
 Email: [aaraav2810@gmail.com](mailto:aaraav2810@gmail.com)
 

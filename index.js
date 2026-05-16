@@ -19,6 +19,7 @@ dotenv.config();
 const openapiDocument = JSON.parse(fs.readFileSync('./openapi.json', 'utf-8'));
 
 const app = express();
+app.set('trust proxy', 1);
 
 app.use(json());
 app.use(cors());
@@ -69,9 +70,14 @@ const PORT = process.env.PORT || 3000;
 connectInfrastructure().then(() => {
     startReminderCron();
 
-    setInterval(() => {
-        https.get('https://epify-gf25.onrender.com/health', () => {}).on('error', () => {});
-    }, 10 * 60 * 1000);
+    setInterval(
+        () => {
+            https
+                .get('https://epify-gf25.onrender.com/health', () => {})
+                .on('error', () => {});
+        },
+        10 * 60 * 1000
+    );
 
     app.listen(PORT, () => {
         console.log(`✅ Server running on port ${PORT}`);

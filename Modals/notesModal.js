@@ -28,7 +28,7 @@ const noteSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
-         remind_at: {
+        remind_at: {
             type: Date,
             default: null,
         },
@@ -42,6 +42,19 @@ const noteSchema = new mongoose.Schema(
     }
 );
 noteSchema.index({ title: 'text', content: 'text' });
+
+noteSchema.set('toJSON', {
+    transform: (doc, ret) => {
+        ret.id = ret._id;
+        ret.created_at = ret.createdAt;
+        ret.updated_at = ret.updatedAt;
+        delete ret._id;
+        delete ret.__v;
+        delete ret.createdAt;
+        delete ret.updatedAt;
+        return ret;
+    },
+});
 
 const Note = mongoose.model('Note', noteSchema);
 

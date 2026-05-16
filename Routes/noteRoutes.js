@@ -11,7 +11,7 @@ import {
     shareNote,
     togglePin,
     setReminder,
-    deleteReminder
+    deleteReminder,
 } from '../Controllers/notes.js';
 
 router.post('/', auth, createNote);

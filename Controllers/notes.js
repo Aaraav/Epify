@@ -287,7 +287,6 @@ export const togglePin = async (req, res) => {
     }
 };
 
-
 export const setReminder = async (req, res) => {
     try {
         const noteId = req.params.id;
@@ -301,7 +300,12 @@ export const setReminder = async (req, res) => {
         const reminderDate = new Date(remind_at);
 
         if (isNaN(reminderDate.getTime())) {
-            return res.status(400).json({ message: 'Invalid date format. Use ISO 8601 e.g. 2026-05-20T10:00:00Z' });
+            return res
+                .status(400)
+                .json({
+                    message:
+                        'Invalid date format. Use ISO 8601 e.g. 2026-05-20T10:00:00Z',
+                });
         }
 
         if (reminderDate <= new Date()) {
