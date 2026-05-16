@@ -2,7 +2,7 @@
 
 A scalable RESTful Notes Management API built with **Node.js, Express.js, MongoDB, Redis, and JWT Authentication**.
 
-Epify allows users to create, manage, search, share, and organize notes securely with support for caching, pagination, authentication, pinned notes, and rate limiting. Humans create hundreds of notes and then need systems to remember where they put them. Software politely cleans up the situation.
+Epify allows users to create, manage, search, share, and organize notes securely with support for caching, pagination, authentication, pinned notes, time-based reminders, and rate limiting. Humans create hundreds of notes and then need systems to remember where they put them. Software politely cleans up the situation.
 
 ---
 
@@ -12,45 +12,38 @@ Epify allows users to create, manage, search, share, and organize notes securely
 - 👤 User Registration & Login
 - 📝 Create, Read, Update, Delete Notes
 - 📌 Pin / Unpin Notes
+- ⏰ Time-based Note Reminders with Email Notification
 - 🤝 Share notes with other users
 - 🔎 Full-text search across notes
 - ⚡ Redis caching for paginated notes
 - 📄 Pagination support
 - 📧 Email notifications using Brevo SMTP
-- 🛡️ Input validation
+- 🛡️ Input validation & error handling
 - 🚦 Rate limiting with Express Rate Limit
 - 📚 Swagger/OpenAPI documentation
-- 🧪 API testing with edge cases
-
 ---
 
 ## Tech Stack
 
 ### Backend
-
 - Node.js
 - Express.js
 
 ### Database
-
 - MongoDB
 - Mongoose
 
 ### Caching
-
 - Redis
 
 ### Authentication
-
 - JWT (JSON Web Token)
 
 ### Documentation
-
 - Swagger UI
 - OpenAPI Specification
 
 ### Email Service
-
 - Brevo SMTP
 
 ---
@@ -68,23 +61,25 @@ Epify allows users to create, manage, search, share, and organize notes securely
 
 ### Notes
 
-| Method | Endpoint           | Description                   |
-| ------ | ------------------ | ----------------------------- |
-| GET    | `/notes`           | Get all notes with pagination |
-| POST   | `/notes`           | Create a note                 |
-| GET    | `/notes/:id`       | Get note by ID                |
-| PUT    | `/notes/:id`       | Update note                   |
-| DELETE | `/notes/:id`       | Delete note                   |
-| POST   | `/notes/:id/share` | Share note                    |
-| PATCH  | `/notes/:id/pin`   | Pin / Unpin note              |
+| Method | Endpoint                  | Description                   |
+| ------ | ------------------------- | ----------------------------- |
+| GET    | `/notes`                  | Get all notes with pagination |
+| POST   | `/notes`                  | Create a note                 |
+| GET    | `/notes/:id`              | Get note by ID                |
+| PUT    | `/notes/:id`              | Update note                   |
+| DELETE | `/notes/:id`              | Delete note                   |
+| POST   | `/notes/:id/share`        | Share note with another user  |
+| PATCH  | `/notes/:id/pin`          | Pin / Unpin note              |
+| PATCH  | `/notes/:id/reminder`     | Set a reminder on a note      |
+| DELETE | `/notes/:id/reminder`     | Delete reminder from a note   |
 
 ---
 
 ### Search
 
-| Method | Endpoint            | Description  |
-| ------ | ------------------- | ------------ |
-| GET    | `/search?q=keyword` | Search notes |
+| Method | Endpoint            | Description               |
+| ------ | ------------------- | ------------------------- |
+| GET    | `/search?q=keyword` | Full-text search in notes |
 
 ---
 
@@ -92,8 +87,8 @@ Epify allows users to create, manage, search, share, and organize notes securely
 
 | Method | Endpoint        | Description           |
 | ------ | --------------- | --------------------- |
-| GET    | `/health`       | Server health         |
-| GET    | `/about`        | Project features      |
+| GET    | `/health`       | Server health check   |
+| GET    | `/about`        | Project & features    |
 | GET    | `/openapi.json` | OpenAPI specification |
 | GET    | `/docs`         | Swagger documentation |
 
@@ -119,24 +114,18 @@ Install dependencies:
 npm install
 ```
 
-Create `.env`
+Create `.env`:
 
 ```env
 PORT=3000
-
 MONGO_URI=your_mongodb_connection
-
 JWT_SECRET=your_secret
-
 REDIS_URL=your_redis_url
-
-SMTP_HOST=your_smtp_host
-
-SMTP_PORT=587
-
-SMTP_USER=your_email
-
-SMTP_PASS=your_password
+BREVO_HOST=smtp-relay.brevo.com
+BREVO_PORT=2525
+BREVO_USER=your_brevo_email
+BREVO_PASS=your_brevo_smtp_key
+SENDER_EMAIL=your_sender_email
 ```
 
 Run development server:
@@ -158,14 +147,12 @@ npm start
 Swagger documentation:
 
 Local:
-
-```bash
+```
 http://localhost:3000/docs
 ```
 
 Production:
-
-```bash
+```
 https://epify-gf25.onrender.com/docs
 ```
 
@@ -173,13 +160,30 @@ https://epify-gf25.onrender.com/docs
 
 ## Live Deployment
 
-Production API:
+Production API: https://epify-gf25.onrender.com
 
-https://epify-gf25.onrender.com
+Swagger: https://epify-gf25.onrender.com/docs
 
-Swagger:
+---
 
-https://epify-gf25.onrender.com/docs
+## Note Reminders
+
+Users can set a time-based reminder on any note:
+
+```
+PATCH /notes/:id/reminder
+{ "remind_at": "2026-06-01T10:00:00Z" }
+```
+
+- Reminder stored as ISO 8601 UTC datetime on the note
+- A cron job runs every minute checking for due reminders
+- When due, an email is sent via Brevo SMTP to the note owner
+- Redis lock prevents duplicate emails if the cron job overlaps
+- Reminder is cleared after the email is sent
+
+```
+DELETE /notes/:id/reminder  →  cancel a reminder
+```
 
 ---
 
@@ -187,16 +191,16 @@ https://epify-gf25.onrender.com/docs
 
 Paginated notes are cached per user:
 
-```js
+```
 notes:{userId}:page:{page}:limit:{limit}
 ```
 
 Cache automatically invalidates when:
-
 - Creating notes
 - Updating notes
 - Deleting notes
 - Sharing notes
+- Setting or deleting reminders
 
 ---
 
@@ -212,52 +216,43 @@ Cache automatically invalidates when:
 
 ## Security Features
 
-- JWT authentication
-- Password hashing
-- Protected routes
-- Request rate limiting
-- Input validation
-- Error handling middleware
+- JWT authentication with 7-day expiry
+- Bcrypt password hashing
+- Protected routes via auth middleware
+- Request rate limiting (100 req / 15 min globally, 20 req / 15 min on auth routes)
+- Input validation on all endpoints
+- trust proxy enabled for accurate IP detection on Render
+- Global error handling middleware
 
 ---
 
 ## Project Structure
 
-```bash
+```
 Epify/
 │
 ├── Controllers/
+│   └── notes.js
+│   └── auth.js
 ├── Middleware/
-├── Models/
+│   └── auth.js
+│   └── validateObjectId.js
+├── Modals/
+│   └── notesModal.js
+│   └── userModal.js
 ├── Routes/
+│   └── noteRoutes.js
+│   └── userRoutes.js
+│   └── searchRoutes.js
+│   └── aboutRoute.js
 ├── Utils/
+│   └── sendMail.js
+│   └── reminder.js
 ├── openapi.json
+├── Connections.js
 ├── server.js
 ├── package.json
-└── test.js
 ```
-
----
-
-## Testing
-
-Run tests:
-
-```bash
-node test.js
-```
-
-Current tests cover:
-
-- Authentication
-- CRUD operations
-- Search
-- Sharing
-- Pagination
-- Authorization
-- Rate limiting
-- OpenAPI endpoints
-- Edge cases
 
 ---
 
@@ -267,8 +262,8 @@ Current tests cover:
 - AI-powered note summarization
 - Tags and categories
 - Soft delete with restore
-- Reminder notifications
 - File attachments
+- Mobile app frontend
 
 ---
 
@@ -278,18 +273,8 @@ Current tests cover:
 
 Backend Developer | Full Stack Developer
 
-**Tech Stack**
-
-- Node.js
-- Express.js
-- MongoDB
-- Redis
-- JWT
-- Docker
-- React
-- Next.js
-
 Email: [aaraav2810@gmail.com](mailto:aaraav2810@gmail.com)
+phone no: 8920390010
 
 GitHub: https://github.com/Aaraav
 
