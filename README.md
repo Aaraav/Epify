@@ -21,6 +21,7 @@ Epify allows users to create, manage, search, share, and organize notes securely
 - 🛡️ Input validation & error handling
 - 🚦 Rate limiting with Express Rate Limit
 - 📚 Swagger/OpenAPI documentation
+- 🧪 Automated E2E Regression Test Suite
 ---
 
 ## Tech Stack
@@ -142,6 +143,13 @@ npm start
 
 ---
 
+## Test
+```
+node test.js
+```
+
+
+
 ## API Documentation
 
 Swagger documentation:
@@ -252,6 +260,7 @@ Epify/
 ├── Connections.js
 ├── server.js
 ├── package.json
+|-- test.js
 ```
 
 ---

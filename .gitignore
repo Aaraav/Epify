@@ -17,8 +17,7 @@ coverage/
 # prettier
 .prettier-cache
 
-# tests
-test.js
+
 
 # OS files
 .DS_Store
