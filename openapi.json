@@ -9,7 +9,7 @@
 
     "servers": [
         {
-            "url": "http://localhost:3000"
+            "url": "https://epify-gf25.onrender.com"
         }
     ],
 
@@ -35,14 +35,8 @@
                                 "type": "object",
                                 "required": ["email", "password"],
                                 "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "example": "user@example.com"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "example": "Password@123"
-                                    }
+                                    "email": { "type": "string", "example": "user@example.com" },
+                                    "password": { "type": "string", "example": "Password@123" }
                                 }
                             }
                         }
@@ -67,14 +61,8 @@
                                 "type": "object",
                                 "required": ["email", "password"],
                                 "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "example": "user@example.com"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "example": "Password@123"
-                                    }
+                                    "email": { "type": "string", "example": "user@example.com" },
+                                    "password": { "type": "string", "example": "Password@123" }
                                 }
                             }
                         }
@@ -132,14 +120,8 @@
                                             "id": { "type": "string" },
                                             "title": { "type": "string" },
                                             "content": { "type": "string" },
-                                            "created_at": {
-                                                "type": "string",
-                                                "format": "date-time"
-                                            },
-                                            "updated_at": {
-                                                "type": "string",
-                                                "format": "date-time"
-                                            }
+                                            "created_at": { "type": "string", "format": "date-time" },
+                                            "updated_at": { "type": "string", "format": "date-time" }
                                         }
                                     }
                                 }
@@ -162,10 +144,7 @@
                                 "required": ["title", "content"],
                                 "properties": {
                                     "title": { "type": "string", "example": "My Note" },
-                                    "content": {
-                                        "type": "string",
-                                        "example": "Note content here"
-                                    }
+                                    "content": { "type": "string", "example": "Note content here" }
                                 }
                             }
                         }
@@ -182,14 +161,8 @@
                                         "id": { "type": "string" },
                                         "title": { "type": "string" },
                                         "content": { "type": "string" },
-                                        "created_at": {
-                                            "type": "string",
-                                            "format": "date-time"
-                                        },
-                                        "updated_at": {
-                                            "type": "string",
-                                            "format": "date-time"
-                                        }
+                                        "created_at": { "type": "string", "format": "date-time" },
+                                        "updated_at": { "type": "string", "format": "date-time" }
                                     }
                                 }
                             }
@@ -292,10 +265,7 @@
                                 "type": "object",
                                 "required": ["share_with_email"],
                                 "properties": {
-                                    "share_with_email": {
-                                        "type": "string",
-                                        "example": "friend@example.com"
-                                    }
+                                    "share_with_email": { "type": "string", "example": "friend@example.com" }
                                 }
                             }
                         }
@@ -309,48 +279,122 @@
                 }
             }
         },
+
         "/notes/{id}/pin": {
             "patch": {
                 "summary": "Pin or unpin a note",
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
+                "security": [{ "BearerAuth": [] }],
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
                         "required": true,
-                        "schema": {
-                            "type": "string"
-                        },
+                        "schema": { "type": "string" },
                         "description": "Note ID"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Pin status updated successfully",
+                        "description": "Pin status toggled successfully",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
                                     "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Note Pinned Successfully"
-                                        }
+                                        "message": { "type": "string", "example": "Note Pinned Successfully" }
                                     }
                                 }
                             }
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "404": {
-                        "description": "Note not found"
+                    "401": { "description": "Unauthorized" },
+                    "404": { "description": "Note not found" }
+                }
+            }
+        },
+
+        "/notes/{id}/reminder": {
+            "patch": {
+                "summary": "Set a reminder on a note",
+                "security": [{ "BearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string" },
+                        "description": "Note ID"
                     }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["remind_at"],
+                                "properties": {
+                                    "remind_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-06-01T10:00:00Z",
+                                        "description": "ISO 8601 future datetime for the reminder"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Reminder set successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Reminder set successfully" },
+                                        "remind_at": { "type": "string", "format": "date-time" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": { "description": "remind_at is required or must be a future date" },
+                    "401": { "description": "Unauthorized" },
+                    "404": { "description": "Note not found" }
+                }
+            },
+
+            "delete": {
+                "summary": "Delete reminder from a note",
+                "security": [{ "BearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string" },
+                        "description": "Note ID"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reminder deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": { "type": "string", "example": "Reminder deleted successfully" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": { "description": "No reminder set on this note" },
+                    "401": { "description": "Unauthorized" },
+                    "404": { "description": "Note not found" }
                 }
             }
         },
@@ -403,14 +447,8 @@
                                                     "id": { "type": "string" },
                                                     "title": { "type": "string" },
                                                     "content": { "type": "string" },
-                                                    "created_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    },
-                                                    "updated_at": {
-                                                        "type": "string",
-                                                        "format": "date-time"
-                                                    }
+                                                    "created_at": { "type": "string", "format": "date-time" },
+                                                    "updated_at": { "type": "string", "format": "date-time" }
                                                 }
                                             }
                                         }
@@ -422,6 +460,29 @@
                     "400": { "description": "Search query is required" },
                     "401": { "description": "Unauthorized" },
                     "404": { "description": "No notes found" }
+                }
+            }
+        },
+
+        "/health": {
+            "get": {
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "Server is running",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "status": { "type": "string", "example": "ok" },
+                                        "uptime": { "type": "string", "example": "120s" },
+                                        "timestamp": { "type": "string", "format": "date-time" }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         },
