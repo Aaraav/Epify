@@ -22,7 +22,7 @@ export const createNote = async (req, res) => {
 
         // Invalidate this user's notes list cache
         await invalidateUserNotesCache(req.user.id);
-W
+
         res.status(201).json({ message: 'Note created', note });
     } catch (err) {
         res.status(500).json({ message: err.message });
